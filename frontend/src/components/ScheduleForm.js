@@ -1,12 +1,12 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useScheduleContext } from "../hooks/useScheduleContext";
 
 const ScheduleForm = () => {
-  const { dispatch } = useScheduleContext();
+  const { dispatch, schedules } = useScheduleContext();
   const [selectedDay, setDay] = useState('');
   const [selectedTime, setTime] = useState('');
   const [error, setError] = useState(null);
-  const [emptyFields, setEmptyFields] = useState([]);
+  const [reservedTimes, setReservedTimes] = useState({});
 
   const daysOfWeek = [
     'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday',
@@ -16,11 +16,28 @@ const ScheduleForm = () => {
     '9:00 AM', '10:00 AM', '11:00 AM', '12:00 PM', '1:00 PM', '2:00 PM', '3:00 PM',
   ];
 
+  // Function to check if the time is reserved
+  const isTimeReserved = (day, time) => {
+    return reservedTimes[day]?.includes(time);
+  };
+
+  // Populate reserved times from schedules
+  useEffect(() => {
+    const reserved = {};
+    schedules.forEach(schedule => {
+      if (!reserved[schedule.day]) {
+        reserved[schedule.day] = [];
+      }
+      reserved[schedule.day].push(schedule.time);
+    });
+    setReservedTimes(reserved);
+  }, [schedules]); // Depend on schedules
+
   const handleSubmit = async (e) => {
     e.preventDefault();
 
     const schedule = { day: selectedDay, time: selectedTime };
-    
+
     const response = await fetch('/api/schedule', {
       method: 'POST',
       body: JSON.stringify(schedule),
@@ -32,13 +49,10 @@ const ScheduleForm = () => {
 
     if (!response.ok) {
       setError(json.error);
-      setEmptyFields(json.emptyFields);
     } else {
       setError(null);
       setDay('');
       setTime('');
-      setEmptyFields([]);
-      console.log('new reservation added:', json);
       dispatch({ type: 'CREATE_SCHEDULE', payload: json });
     }
   };
@@ -48,13 +62,14 @@ const ScheduleForm = () => {
       <h3>Add reservation</h3>
 
       <label>Set day (mon-sun):</label>
-      <div className={emptyFields.includes('day') ? 'day-buttons error' : 'day-buttons'}>
+      <div className="day-buttons">
         {daysOfWeek.map((day) => (
           <button 
             type="button" 
             key={day} 
             onClick={() => setDay(day)}
             className={day === selectedDay ? 'selected' : ''}
+            disabled={isTimeReserved(day, selectedTime)}
           >
             {day}
           </button>
@@ -62,13 +77,14 @@ const ScheduleForm = () => {
       </div>
       
       <label>Set time (ex: 9:00 am):</label>
-      <div className={emptyFields.includes('time') ? 'time-buttons error' : 'time-buttons'}>
+      <div className="time-buttons">
         {timeBox.map((time) => (
           <button 
             type="button" 
             key={time} 
             onClick={() => setTime(time)}
-            className={time === selectedTime ? 'selected' : ''}
+            className={`${time === selectedTime ? 'selected' : ''} ${isTimeReserved(selectedDay, time) ? 'reserved' : ''}`}
+            disabled={isTimeReserved(selectedDay, time)}
           >
             {time}
           </button>
