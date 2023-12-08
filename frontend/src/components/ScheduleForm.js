@@ -23,18 +23,18 @@ const ScheduleForm = () => {
 
   // Populate reserved times from schedules
   useEffect(() => {
-  if (schedules) {
-    const reserved = {};
-    schedules.forEach(schedule => {
-      if (!reserved[schedule.day]) {
-        reserved[schedule.day] = [];
-      }
-      reserved[schedule.day].push(schedule.time);
-    });
-    setReservedTimes(reserved);
-  }
-}, [schedules]);
- // Depend on schedules
+    if (schedules) {
+      const reserved = {};
+      schedules.forEach(schedule => {
+        if (!reserved[schedule.day]) {
+          reserved[schedule.day] = [];
+        }
+        reserved[schedule.day].push(schedule.time);
+      });
+      setReservedTimes(reserved);
+    }
+  }, [schedules]);
+   // Depend on schedules
 
   const handleSubmit = async (e) => {
     e.preventDefault();
