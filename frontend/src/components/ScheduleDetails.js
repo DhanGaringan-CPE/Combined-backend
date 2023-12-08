@@ -32,4 +32,3 @@ const { dispatch } = useScheduleContext()
   
   export default ScheduleDetails
 
-// <h4 style={{ color: '#24b28a' }}>Reservation</h4>
