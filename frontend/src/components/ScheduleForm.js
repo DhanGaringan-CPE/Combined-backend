@@ -70,11 +70,13 @@ const ScheduleForm = () => {
       // Ensure wash is selected before the others
       setLaundryServices([option]);
     } else if (option === "Dry") {
-      if (laundry_services.includes("Wash")) {
+      if (laundry_services.includes("Wash") && !laundry_services.includes("Dry")) {
+        // Add "Dry" only if "Wash" is included and "Dry" is not
         setLaundryServices([...laundry_services, option]);
       }
     } else if (option === "Fold") {
-      if (laundry_services.includes("Wash") && laundry_services.includes("Dry")) {
+      if (laundry_services.includes("Wash") && laundry_services.includes("Dry") && !laundry_services.includes("Fold")) {
+        // Add "Fold" only if "Wash" and "Dry" are included and "Fold" is not
         setLaundryServices([...laundry_services, option]);
       }
     }
