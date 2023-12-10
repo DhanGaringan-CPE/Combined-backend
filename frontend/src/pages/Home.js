@@ -24,6 +24,24 @@ const Home = () => {
     fetchSchedules()
   }, [dispatch])
 
+  useEffect(() => {
+    const fetchOrderDetails = async () => {
+      try {
+        const response = await fetch('/api/orderDetails'); // Remove trailing slash
+        if (response.ok) {
+          const json = await response.json();
+          dispatch({ type: 'SET_ORDERDETAILS', payload: json });
+        } else {
+          console.error("Failed to fetch order details:", response.status);
+        }
+      } catch (error) {
+        console.error("Error while fetching order details:", error);
+      }
+    };
+    fetchOrderDetails();
+  }, [dispatch]); // Add 'dispatch' to the dependency array
+
+
   return (
     <div className="home">
       <div className="schedules">
